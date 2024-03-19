@@ -8,5 +8,8 @@
   },
   "devDependencies": {
     "hardhat": "^2.19.4"
+  },
+  "scripts": {
+    "server": "node ./apps/server/src/index.js"
   }
 }

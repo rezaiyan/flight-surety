@@ -62,6 +62,11 @@ Follow these steps to set up and run the FlightSurety DApp:
      npm start
      ```
 
+6. **Launch the Oracle Server**:
+     ```
+     npm run server
+     ```
+
 ## Using the FlightSurety DApp
 
 - **Purchasing Insurance**: Passengers can select flights and purchase insurance through the DApp interface.

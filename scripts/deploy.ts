@@ -2,6 +2,9 @@
 // yours, or create new ones.
 import { ethers } from "hardhat";
 import path from "path";
+import fs from 'fs';
+import ContractArtifact from '../artifacts/contracts/FlightSuretyApp.sol/FlightSuretyApp.json' assert { type: 'json' };
+
 
 async function main() {
   // This is just a convenience check
@@ -26,7 +29,21 @@ async function main() {
   console.log("flightSuretyApp address:", address);
 
   // We also save the contract's artifacts and address in the frontend directory
-  // saveFrontendFiles(supplyChain);
+  const contractsDir = path.join(__dirname, '..', 'artifacts', 'contracts');
+
+  if (!fs.existsSync(contractsDir)) {
+    fs.mkdirSync(contractsDir, { recursive: true });
+  }
+
+  fs.writeFileSync(
+    path.join(contractsDir, 'address.json'),
+    JSON.stringify({ address: address }, undefined, 2)
+  );
+
+  fs.writeFileSync(
+    path.join(contractsDir, 'artifact.json'),
+    JSON.stringify(ContractArtifact, null, 2)
+  );
 }
 
 
