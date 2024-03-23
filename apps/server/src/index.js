@@ -1,3 +1,4 @@
+//Oracle functionality is implemented in the server app.
 import dotenv from 'dotenv'
 import express from 'express';
 import cors from 'cors';
@@ -32,7 +33,7 @@ function setupContract() {
     console.log(`Connected to contract at address: ${flightSuretyApp.address}`);
 
     flightSuretyApp.on("UpdateOperatingStatus", (mode) => {
-        console.log("UpdateOperatingStatus payload: " + mode);
+        console.log("UpdateOperatingStatus mode: " + mode);
     });
 
     flightSuretyApp.on("FlightRegistered", (flightNumber, sender) => {
@@ -40,11 +41,11 @@ function setupContract() {
     });
 
     flightSuretyApp.on("FlightStatusInfo", (airline, flight, timestamp, statusCode) => {
-        console.log(`--FlightStatusInfo--`);
         console.log(`airline: ${airline},flight: ${flight},timestamp: ${timestamp},airline: ${statusCode},`);
-        console.log(`--FlightStatusInfo--`);
     });
 
+    //Update flight status requests from client Dapp result in OracleRequest event emitted by Smart Contract 
+    //that is captured by server (displays on console and handled in code)
     flightSuretyApp.on("OracleRequest", async (index, airline, flight, timestamp) => {
         let payload = {
             index: index,
@@ -52,32 +53,26 @@ function setupContract() {
             flight: flight,
             timestamp: timestamp,
         };
-
+        console.log(`OracleRequest received`);
+        //Server will loop through all registered oracles, identify those oracles for which the OracleRequest event applies,
+        //and respond by calling into FlightSuretyApp contract with random status code of
+        //Unknown (0), On Time (10) or Late Airline (20), Late Weather (30), Late Technical (40), or Late Other (50)
         let statusCodeList = [0, 10, 20, 30, 40, 50];
         let statusCode = statusCodeList[Math.floor(Math.random() * statusCodeList.length)];
+        console.log(`New status code: ${statusCode}`);
 
         let matchingOracles = registeredOracles.filter(oracle => oracle.indexes.includes(index));
-        console.log(`await newContract.getFlightExistsStatus(${flight}): ` + await flightSuretyApp.getFlightExistsStatus(flight));
 
         for (let oracle of matchingOracles) {
             try {
                 const oracleSigner = provider.getSigner(oracle.address);
-
-                console.log(`--timestamp--: ${payload.timestamp}`);
                 const tx = await flightSuretyApp.connect(oracleSigner).submitOracleResponse(
                     payload.index, payload.airline, payload.flight, payload.timestamp, statusCode, { gasLimit: 5000000 }
                 );
                 await tx.wait();
-                console.log(`--SUCCESS--`);
                 console.log(`Oracle response submitted: ${oracle.address} with status code ${statusCode}`);
-                console.log(`index: ${index}, airline: ${airline}, flight: ${flight}, timestamp: ${timestamp}, statusCode: ${statusCode}`);
-                console.log(`--SUCCESS--`);
             } catch (error) {
-
-                console.log(`--Failed--`);
                 console.error(`Error submitting oracle response from ${oracle.address}: ${error.message}`);
-                console.log(`index: ${index}, airline: ${airline}, flight: ${flight}, timestamp: ${timestamp}, statusCode: ${statusCode}`);
-                console.log(`--Failed--`);
             }
         }
     });
@@ -91,8 +86,6 @@ function setupServer() {
 async function registerOracles(accounts) {
     try {
         const registrationPromises = accounts.map(async (account, index) => {
-            const balance = await provider.getBalance(account);
-            console.log(`Oracle balance: ${balance}`);
             const app = flightSuretyApp.connect(provider.getSigner(account));
             try {
                 const _1ETH = ethers.utils.parseEther('1');
@@ -120,6 +113,7 @@ async function main() {
     setupContract();
     setupServer();
     const oracleAccounts = await provider.listAccounts();
+    //Upon startup, 20+ oracles are registered and their assigned indexes are persisted in memory
     registerOracles(oracleAccounts.slice(10, 30));
 }
 
