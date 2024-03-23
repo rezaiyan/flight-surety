@@ -96,10 +96,10 @@ This project utilizes Hardhat as the primary development framework, given its po
 
 | Feature            | Screenshot                                       |
 | ------------------ | ------------------------------------------------ |
-| Deployment       |  <img src="assets/deploy.png" width="300" height="300"/>       |
-| Oracle Registeration      | <img src="assets/oracle-registeration.png" width="300" height="300"/>        |
-| Purchase | <img src="assets/purchaseSuccessful.png" width="300" height="300"/> |
-| Credit | <img src="assets/showCredit.png" width="300" height="300"/>   |
+| Deployment       |  <img src="assets/deploy.png" width="300" />       |
+| Oracle Registeration      | <img src="assets/oracle-registeration.png" width="300"/>        |
+| Purchase | <img src="assets/purchaseSuccessful.png" width="300" /> |
+| Credit | <img src="assets/showCredit.png" width="300"/>   |
 
 
 
