@@ -6,8 +6,6 @@ Here you can find outlines key information and provides instructions for setting
 
 Explore the FlightSurety smart contracts and transactions via these links on the Sepolia testnet:
 
-- **Deployment Transaction**: [View Here](TBD)
-- **Smart Contract Address**: [View Here](TBD)
 
 ## About FlightSurety
 
@@ -67,12 +65,24 @@ These scripts are designed to make the development, testing, and deployment proc
   ```
    npm run <command>
    ```
-   
+
    **Run Tests**:
    - Ensure smart contract integrity through comprehensive tests:
      ```
      npx hardhat test
      ```
+
+## Deployment Process
+- **Compile Smart Contracts**: Initiates the compilation of smart contracts using Hardhat, which generates the necessary artifacts, including the ABI (Application Binary Interface) and bytecode.
+- **Network Check**: Verifies the deployment network to prevent accidental deployments to the ephemeral Hardhat Network, suggesting the use of `--network localhost` for local deployments.
+- **Fetch Signers**: Utilizes Hardhat's environment to obtain signer accounts, specifically identifying the deployer and an initial airline account for deployment purposes.
+- **Deploy Contract**: Executes the deployment of the `FlightSuretyApp` contract to the chosen Ethereum network, leveraging the deployer account for the transaction.
+- **Wait for Deployment Completion**: Awaits the finalization of the contract deployment process and then captures the contract's deployed address.
+- **Artifact and Address Distribution**:
+    - **Frontend Application**: The contract's ABI and address are saved in the `apps/frontend/src/artifacts/contracts` directory, ensuring the frontend application can properly interact with the deployed contract.
+    - **Server Application**: Similarly, the artifacts are also placed in the `apps/server/src/artifacts/contracts` directory, enabling the server-side application to communicate with the contract.
+    - **General Artifacts Storage**: Additionally, a copy of the contract's artifacts is stored in the general `artifacts/contracts` directory for reference or other uses.
+- **Error Handling**: Manages and logs any errors encountered during the deployment process, facilitating debugging and ensuring smooth deployment operations.
 
 ## Using the FlightSurety DApp
 
@@ -83,6 +93,15 @@ These scripts are designed to make the development, testing, and deployment proc
 ## Development Environment
 
 This project utilizes Hardhat as the primary development framework, given its powerful testing, debugging, and deployment features. Notably, Solidity version 0.8.20 is used for smart contract development, eliminating the need for the SafeMath library due to built-in overflow and underflow checks.
+
+| Feature            | Screenshot                                       |
+| ------------------ | ------------------------------------------------ |
+| Deployment       |  <img src="assets/deploy.png" width="300" height="300"/>       |
+| Oracle Registeration      | <img src="assets/oracle-registeration.png" width="300" height="300"/>        |
+| Purchase | <img src="assets/purchaseSuccessful.png" width="300" height="300"/> |
+| Credit | <img src="assets/showCredit.png" width="300" height="300"/>   |
+
+
 
 ## Contributing
 
