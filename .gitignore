@@ -6,6 +6,7 @@ build
 /build
 /typechain-types
 /cache
+/artifacts
 .env
 # misc
 .DS_Store
