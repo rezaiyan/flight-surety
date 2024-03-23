@@ -90,9 +90,35 @@ These scripts are designed to make the development, testing, and deployment proc
 - **Checking Flight Status**: The Oracle server application simulates real-world flight information updates, triggering automatic insurance payouts as applicable.
 - **Receiving Payouts**: In the event of a flight delay due to airline fault, insured passengers are automatically credited with payouts, which they can withdraw through the DApp.
 
-## Development Environment
+## Libraries Used
 
-This project utilizes Hardhat as the primary development framework, given its powerful testing, debugging, and deployment features. Notably, Solidity version 0.8.20 is used for smart contract development, eliminating the need for the SafeMath library due to built-in overflow and underflow checks.
+### Supply Chain Dapp (Smart Contracts)
+
+- `@nomicfoundation/hardhat-toolbox` (Version: ^4.0.0)
+     - It provides essential utilities for testing, deployment, and development workflows, making it easier to manage the Ethereum smart contracts in the project.
+- `chai` (Version: ^4.4.1)
+     - Chai allows for expressive and readable assertions in contract testing, making it easier to validate contract behavior.
+- `dotenv` (Version: ^16.4.5)
+     -  It helps manage sensitive information like API keys and mnemonic phrases for Ethereum wallets securely by separating them from the codebase. 
+- `hardhat` (Version: ^2.22.1)
+     - Hardhat is chosen as the core development tool for Ethereum smart contracts in the project, providing a reliable and extensible development  
+
+### Frontend App
+
+- @types (packages):
+    - TypeScript type definitions enhance code quality and help catch type-related errors during development.
+- `@web3-react/core` (Version: ^6.1.9)
+    -  It abstracts the complexities of connecting to Ethereum wallets, making it easier to handle wallet-related interactions in the frontend. 
+- `@web3-react/injected-connector` (Version: ^6.0.7)
+    - For connecting to Ethereum wallets that inject the Ethereum provider into the browser, such as MetaMask or other browser extensions. 
+- `ethers` (Version: ^5.5.2)
+    - Ethers.js simplifies interactions with Ethereum smart contracts and blockchain data, making it easier to build Ethereum-related functionality in the  
+- `react` (Version: ^17.0.2) and `react-dom` (Version: ^17.0.2)
+    - React is the core library for building the frontend user interface of the application. It offers component-based architecture and efficient rendering. 
+- `react-scripts` (Version: 5.0.0)
+    - Used as a development dependency in a React project to streamline various development tasks 
+- `styled-components` (Version: ^5.3.3)
+    -  It enables the creation of dynamic and styled components, providing a more maintainable and structured approach to styling React components.
 
 | Feature            | Screenshot                                       |
 | ------------------ | ------------------------------------------------ |
