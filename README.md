@@ -43,28 +43,35 @@ Follow these steps to set up and run the FlightSurety DApp:
    npx hardhat compile
    ```
 
-4. **Run Tests**:
+### Script Descriptions
+
+In this project, we've set up a series of npm scripts to streamline the development and deployment process for the FlightSurety DApp. Below, you'll find a brief description of each script, designed to help you understand and efficiently utilize them:
+
+- **`server`**: Launches the backend server application located at `./apps/server/src/index.js`. Use this to start the server side of the DApp.
+
+- **`compile`**: Removes existing compiled artifacts from the project and then compiles the smart contracts using Hardhat. This ensures that your contracts are up-to-date and ready for deployment or testing.
+
+- **`dapp`**: Starts the frontend application of the DApp, which is located in the `./apps/frontend` directory. Use this command to launch the user interface in your browser.
+
+- **`help`**: Displays a list of available npm scripts in the console. This is useful for getting a quick overview of the scripts you can run.
+
+- **Deployment Scripts**:
+    - **`deployLocalhost`**: Deploys the smart contracts to a local Ethereum network (Hardhat Network) running on your machine. This is useful for local development and testing.
+    - **`deploySepolia`**: Deploys the smart contracts to the Sepolia test network. Use this for testing your contracts in a live, testnet environment.
+
+- **Composite Scripts**:
+    - **`flightsuretyLocalhost`**: A composite command that compiles your contracts, starts a local Ethereum node using Hardhat, deploys your contracts to this local node, and finally launches the DApp's frontend. This is your go-to script for quick, local development and testing cycles.
+    - **`flightsuretySepolia`**: Similar to `flightsuretyLocalhost`, but instead of deploying to a local node, it deploys the contracts to the Sepolia test network. This script also compiles your contracts and starts the DApp's frontend, making it ideal for testing your application in a live, testnet environment before final deployment.
+
+These scripts are designed to make the development, testing, and deployment process as smooth and efficient as possible. Whether you're working locally or preparing for a live testnet deployment, these commands provide a streamlined workflow for managing your DApp.
+  ```
+   npm run <command>
+   ```
+   
+   **Run Tests**:
    - Ensure smart contract integrity through comprehensive tests:
      ```
      npx hardhat test
-     ```
-
-5. **Deploy Contracts**:
-   - Deploy the smart contracts to a local development network or the Sepolia testnet. Update the deployment script with the desired network:
-     ```
-     npx hardhat run scripts/deploy.js --network <network-name>
-     ```
-
-6. **Launch the DApp**:
-   - Navigate to the DApp's frontend directory and start the application:
-     ```
-     cd frontend
-     npm start
-     ```
-
-6. **Launch the Oracle Server**:
-     ```
-     npm run server
      ```
 
 ## Using the FlightSurety DApp

@@ -23,11 +23,33 @@ import type {
   TypedContractMethod,
 } from "./common";
 
+export declare namespace FlightSuretyData {
+  export type AirlineStruct = {
+    name: string;
+    _address: AddressLike;
+    isRegistered: boolean;
+    funding: BigNumberish;
+  };
+
+  export type AirlineStructOutput = [
+    name: string,
+    _address: string,
+    isRegistered: boolean,
+    funding: bigint
+  ] & {
+    name: string;
+    _address: string;
+    isRegistered: boolean;
+    funding: bigint;
+  };
+}
+
 export interface FlightSuretyDataInterface extends Interface {
   getFunction(
     nameOrSignature:
       | "INSURANCE_PRICE_LIMIT"
       | "addAirline"
+      | "airlineAddresses"
       | "authorizeCallers"
       | "buy"
       | "creditInsurees"
@@ -38,13 +60,16 @@ export interface FlightSuretyDataInterface extends Interface {
       | "getAirlineName"
       | "getAirlineVoters"
       | "getAirlinesCount"
+      | "getAllAirlines"
       | "getBalance"
       | "getCreditToPay"
       | "getFlightExistsStatus"
       | "getPassengerAddresses"
+      | "getPassengerCredit"
       | "getVotes"
       | "isAirlineRegistered"
       | "isOperational"
+      | "isOwner"
       | "pay"
       | "setAirlineFunding"
       | "setAirlineVoters"
@@ -59,6 +84,7 @@ export interface FlightSuretyDataInterface extends Interface {
       | "CreditWithdrawn"
       | "DeAuthorizedContract"
       | "InsuranceBought"
+      | "UpdateOperatingStatus"
   ): EventFragment;
 
   encodeFunctionData(
@@ -68,6 +94,10 @@ export interface FlightSuretyDataInterface extends Interface {
   encodeFunctionData(
     functionFragment: "addAirline",
     values: [AddressLike, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "airlineAddresses",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "authorizeCallers",
@@ -104,6 +134,10 @@ export interface FlightSuretyDataInterface extends Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "getAllAirlines",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "getBalance",
     values?: undefined
   ): string;
@@ -120,6 +154,10 @@ export interface FlightSuretyDataInterface extends Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "getPassengerCredit",
+    values: [string]
+  ): string;
+  encodeFunctionData(
     functionFragment: "getVotes",
     values: [AddressLike]
   ): string;
@@ -131,6 +169,7 @@ export interface FlightSuretyDataInterface extends Interface {
     functionFragment: "isOperational",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "isOwner", values?: undefined): string;
   encodeFunctionData(functionFragment: "pay", values: [string]): string;
   encodeFunctionData(
     functionFragment: "setAirlineFunding",
@@ -158,6 +197,10 @@ export interface FlightSuretyDataInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "addAirline", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "airlineAddresses",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "authorizeCallers",
     data: BytesLike
@@ -192,6 +235,10 @@ export interface FlightSuretyDataInterface extends Interface {
     functionFragment: "getAirlinesCount",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "getAllAirlines",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "getBalance", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getCreditToPay",
@@ -205,6 +252,10 @@ export interface FlightSuretyDataInterface extends Interface {
     functionFragment: "getPassengerAddresses",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "getPassengerCredit",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "getVotes", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "isAirlineRegistered",
@@ -214,6 +265,7 @@ export interface FlightSuretyDataInterface extends Interface {
     functionFragment: "isOperational",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "isOwner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "pay", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "setAirlineFunding",
@@ -302,6 +354,18 @@ export namespace InsuranceBoughtEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
+export namespace UpdateOperatingStatusEvent {
+  export type InputTuple = [mode: boolean];
+  export type OutputTuple = [mode: boolean];
+  export interface OutputObject {
+    mode: boolean;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
 export interface FlightSuretyData extends BaseContract {
   connect(runner?: ContractRunner | null): FlightSuretyData;
   waitForDeployment(): Promise<this>;
@@ -352,6 +416,8 @@ export interface FlightSuretyData extends BaseContract {
     [void],
     "nonpayable"
   >;
+
+  airlineAddresses: TypedContractMethod<[arg0: BigNumberish], [string], "view">;
 
   authorizeCallers: TypedContractMethod<
     [_address: AddressLike],
@@ -407,6 +473,12 @@ export interface FlightSuretyData extends BaseContract {
 
   getAirlinesCount: TypedContractMethod<[], [bigint], "view">;
 
+  getAllAirlines: TypedContractMethod<
+    [],
+    [FlightSuretyData.AirlineStructOutput[]],
+    "view"
+  >;
+
   getBalance: TypedContractMethod<[], [bigint], "view">;
 
   getCreditToPay: TypedContractMethod<[flightNumber: string], [bigint], "view">;
@@ -418,6 +490,12 @@ export interface FlightSuretyData extends BaseContract {
   >;
 
   getPassengerAddresses: TypedContractMethod<[], [string[]], "view">;
+
+  getPassengerCredit: TypedContractMethod<
+    [flightNumber: string],
+    [bigint],
+    "view"
+  >;
 
   getVotes: TypedContractMethod<
     [_airlineAddress: AddressLike],
@@ -432,6 +510,8 @@ export interface FlightSuretyData extends BaseContract {
   >;
 
   isOperational: TypedContractMethod<[], [boolean], "view">;
+
+  isOwner: TypedContractMethod<[], [boolean], "view">;
 
   pay: TypedContractMethod<[flightNumber: string], [void], "nonpayable">;
 
@@ -480,6 +560,9 @@ export interface FlightSuretyData extends BaseContract {
     "nonpayable"
   >;
   getFunction(
+    nameOrSignature: "airlineAddresses"
+  ): TypedContractMethod<[arg0: BigNumberish], [string], "view">;
+  getFunction(
     nameOrSignature: "authorizeCallers"
   ): TypedContractMethod<[_address: AddressLike], [void], "nonpayable">;
   getFunction(
@@ -520,6 +603,9 @@ export interface FlightSuretyData extends BaseContract {
     nameOrSignature: "getAirlinesCount"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
+    nameOrSignature: "getAllAirlines"
+  ): TypedContractMethod<[], [FlightSuretyData.AirlineStructOutput[]], "view">;
+  getFunction(
     nameOrSignature: "getBalance"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
@@ -532,6 +618,9 @@ export interface FlightSuretyData extends BaseContract {
     nameOrSignature: "getPassengerAddresses"
   ): TypedContractMethod<[], [string[]], "view">;
   getFunction(
+    nameOrSignature: "getPassengerCredit"
+  ): TypedContractMethod<[flightNumber: string], [bigint], "view">;
+  getFunction(
     nameOrSignature: "getVotes"
   ): TypedContractMethod<[_airlineAddress: AddressLike], [bigint], "view">;
   getFunction(
@@ -539,6 +628,9 @@ export interface FlightSuretyData extends BaseContract {
   ): TypedContractMethod<[_airlineAddress: AddressLike], [boolean], "view">;
   getFunction(
     nameOrSignature: "isOperational"
+  ): TypedContractMethod<[], [boolean], "view">;
+  getFunction(
+    nameOrSignature: "isOwner"
   ): TypedContractMethod<[], [boolean], "view">;
   getFunction(
     nameOrSignature: "pay"
@@ -595,6 +687,13 @@ export interface FlightSuretyData extends BaseContract {
     InsuranceBoughtEvent.OutputTuple,
     InsuranceBoughtEvent.OutputObject
   >;
+  getEvent(
+    key: "UpdateOperatingStatus"
+  ): TypedContractEvent<
+    UpdateOperatingStatusEvent.InputTuple,
+    UpdateOperatingStatusEvent.OutputTuple,
+    UpdateOperatingStatusEvent.OutputObject
+  >;
 
   filters: {
     "AuthorizedContract(address)": TypedContractEvent<
@@ -639,6 +738,17 @@ export interface FlightSuretyData extends BaseContract {
       InsuranceBoughtEvent.InputTuple,
       InsuranceBoughtEvent.OutputTuple,
       InsuranceBoughtEvent.OutputObject
+    >;
+
+    "UpdateOperatingStatus(bool)": TypedContractEvent<
+      UpdateOperatingStatusEvent.InputTuple,
+      UpdateOperatingStatusEvent.OutputTuple,
+      UpdateOperatingStatusEvent.OutputObject
+    >;
+    UpdateOperatingStatus: TypedContractEvent<
+      UpdateOperatingStatusEvent.InputTuple,
+      UpdateOperatingStatusEvent.OutputTuple,
+      UpdateOperatingStatusEvent.OutputObject
     >;
   };
 }

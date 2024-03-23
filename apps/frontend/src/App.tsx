@@ -1,7 +1,7 @@
 import { ReactElement } from 'react';
 import styled from 'styled-components';
 import { ActivateDeactivate } from './components/ActivateDeactivate';
-import { GalacticCollectibles } from './components/GalaticCollectibles';
+import { FlightSurety } from './components/FlightSurety';
 import { SectionDivider } from './components/SectionDivider';
 import { SignMessage } from './components/SignMessage';
 import { WalletStatus } from './components/WalletStatus';
@@ -20,7 +20,7 @@ export function App(): ReactElement {
       <SectionDivider />
       <SignMessage />
       <SectionDivider />
-      <GalacticCollectibles />
+      <FlightSurety />
     </StyledAppDiv>
   );
 }

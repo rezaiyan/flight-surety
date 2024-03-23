@@ -21,16 +21,31 @@ async function main() {
   const [deployer, airline] = await ethers.getSigners();
 
   // Deploy the contract
-  const FlightSuretyApp = await ethers.getContractFactory("FlightSuretyApp");
+  const FlightSuretyApp = new ethers.ContractFactory(
+    ContractArtifact.abi,
+    ContractArtifact.bytecode,
+    deployer
+  );
+
   const flightSuretyApp = await FlightSuretyApp.deploy(airline);
   await flightSuretyApp.waitForDeployment();
   const address = await flightSuretyApp.getAddress();
 
+  console.log("owner address:", await deployer.getAddress());
+  console.log("first airline address:", await airline.getAddress());
   console.log("flightSuretyApp address:", address);
 
   // We also save the contract's artifacts and address in the frontend directory
+  const FrontEndContractsDir = path.join(__dirname, '..', 'apps', 'frontend', 'src', 'artifacts', 'contracts');
+  const ServerContractsDir = path.join(__dirname, '..', 'apps', 'server', 'src', 'artifacts', 'contracts');
   const contractsDir = path.join(__dirname, '..', 'artifacts', 'contracts');
+  writeToDir(ServerContractsDir, address);
+  writeToDir(FrontEndContractsDir, address);
+  writeToDir(contractsDir, address);
+  
+}
 
+function writeToDir(contractsDir: string, address: any) {
   if (!fs.existsSync(contractsDir)) {
     fs.mkdirSync(contractsDir, { recursive: true });
   }
@@ -45,7 +60,6 @@ async function main() {
     JSON.stringify(ContractArtifact, null, 2)
   );
 }
-
 
 main()
   .then(() => process.exit(0))

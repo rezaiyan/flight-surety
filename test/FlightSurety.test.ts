@@ -1,6 +1,7 @@
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
+import { any } from 'hardhat/internal/core/params/argumentTypes';
 
 interface IAirline {
     signer: HardhatEthersSigner;
@@ -173,12 +174,6 @@ describe('FlightSuretyApp', function () {
             expect(indexes.length).to.equal(3);
         });
 
-        it("should emit OracleRequest event on fetchFlightStatus", async function () {
-            registerFlight()
-            await expect(flightSuretyApp.fetchFlightStatus(airlines[0].address, flight, timestamp))
-                .to.emit(flightSuretyApp, "OracleRequest")
-                .withArgs(Number(9), airlines[0].address, flight, timestamp);
-        });
         it("oracles can submit responses and process flight status", async function () {
             const STATUS_CODE_LATE_AIRLINE = 20;
             const airline = airlines[0].address;

@@ -23,6 +23,27 @@ import type {
   TypedContractMethod,
 } from "./common";
 
+export declare namespace FlightSuretyData {
+  export type AirlineStruct = {
+    name: string;
+    _address: AddressLike;
+    isRegistered: boolean;
+    funding: BigNumberish;
+  };
+
+  export type AirlineStructOutput = [
+    name: string,
+    _address: string,
+    isRegistered: boolean,
+    funding: bigint
+  ] & {
+    name: string;
+    _address: string;
+    isRegistered: boolean;
+    funding: bigint;
+  };
+}
+
 export declare namespace FlightSuretyApp {
   export type FlightStruct = {
     isRegistered: boolean;
@@ -59,6 +80,7 @@ export interface FlightSuretyAppInterface extends Interface {
       | "INSURANCE_PRICE_LIMIT"
       | "REGISTRATION_FEE"
       | "addAirline"
+      | "airlineAddresses"
       | "authorizeCallers"
       | "buy"
       | "creditInsurees"
@@ -70,15 +92,19 @@ export interface FlightSuretyAppInterface extends Interface {
       | "getAirlineName"
       | "getAirlineVoters"
       | "getAirlinesCount"
+      | "getAllAirlines"
       | "getBalance"
       | "getCreditToPay"
       | "getFlightExistsStatus"
       | "getFlights"
       | "getMyIndexes"
       | "getPassengerAddresses"
+      | "getPassengerCredit"
       | "getVotes"
       | "isAirlineRegistered"
       | "isOperational"
+      | "isOracleRegistered"
+      | "isOwner"
       | "pay"
       | "registerAirline"
       | "registerFlight"
@@ -104,6 +130,7 @@ export interface FlightSuretyAppInterface extends Interface {
       | "OracleReport"
       | "OracleRequest"
       | "RegisteredAirline"
+      | "UpdateOperatingStatus"
   ): EventFragment;
 
   encodeFunctionData(
@@ -117,6 +144,10 @@ export interface FlightSuretyAppInterface extends Interface {
   encodeFunctionData(
     functionFragment: "addAirline",
     values: [AddressLike, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "airlineAddresses",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "authorizeCallers",
@@ -157,6 +188,10 @@ export interface FlightSuretyAppInterface extends Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "getAllAirlines",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "getBalance",
     values?: undefined
   ): string;
@@ -181,6 +216,10 @@ export interface FlightSuretyAppInterface extends Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "getPassengerCredit",
+    values: [string]
+  ): string;
+  encodeFunctionData(
     functionFragment: "getVotes",
     values: [AddressLike]
   ): string;
@@ -192,6 +231,11 @@ export interface FlightSuretyAppInterface extends Interface {
     functionFragment: "isOperational",
     values?: undefined
   ): string;
+  encodeFunctionData(
+    functionFragment: "isOracleRegistered",
+    values?: undefined
+  ): string;
+  encodeFunctionData(functionFragment: "isOwner", values?: undefined): string;
   encodeFunctionData(functionFragment: "pay", values: [string]): string;
   encodeFunctionData(
     functionFragment: "registerAirline",
@@ -248,6 +292,10 @@ export interface FlightSuretyAppInterface extends Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "addAirline", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "airlineAddresses",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "authorizeCallers",
     data: BytesLike
   ): Result;
@@ -285,6 +333,10 @@ export interface FlightSuretyAppInterface extends Interface {
     functionFragment: "getAirlinesCount",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "getAllAirlines",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "getBalance", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getCreditToPay",
@@ -303,6 +355,10 @@ export interface FlightSuretyAppInterface extends Interface {
     functionFragment: "getPassengerAddresses",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "getPassengerCredit",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "getVotes", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "isAirlineRegistered",
@@ -312,6 +368,11 @@ export interface FlightSuretyAppInterface extends Interface {
     functionFragment: "isOperational",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "isOracleRegistered",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "isOwner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "pay", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "registerAirline",
@@ -525,6 +586,18 @@ export namespace RegisteredAirlineEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
+export namespace UpdateOperatingStatusEvent {
+  export type InputTuple = [mode: boolean];
+  export type OutputTuple = [mode: boolean];
+  export interface OutputObject {
+    mode: boolean;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
 export interface FlightSuretyApp extends BaseContract {
   connect(runner?: ContractRunner | null): FlightSuretyApp;
   waitForDeployment(): Promise<this>;
@@ -577,6 +650,8 @@ export interface FlightSuretyApp extends BaseContract {
     [void],
     "nonpayable"
   >;
+
+  airlineAddresses: TypedContractMethod<[arg0: BigNumberish], [string], "view">;
 
   authorizeCallers: TypedContractMethod<
     [_address: AddressLike],
@@ -638,6 +713,12 @@ export interface FlightSuretyApp extends BaseContract {
 
   getAirlinesCount: TypedContractMethod<[], [bigint], "view">;
 
+  getAllAirlines: TypedContractMethod<
+    [],
+    [FlightSuretyData.AirlineStructOutput[]],
+    "view"
+  >;
+
   getBalance: TypedContractMethod<[], [bigint], "view">;
 
   getCreditToPay: TypedContractMethod<[flightNumber: string], [bigint], "view">;
@@ -658,6 +739,12 @@ export interface FlightSuretyApp extends BaseContract {
 
   getPassengerAddresses: TypedContractMethod<[], [string[]], "view">;
 
+  getPassengerCredit: TypedContractMethod<
+    [flightNumber: string],
+    [bigint],
+    "view"
+  >;
+
   getVotes: TypedContractMethod<
     [_airlineAddress: AddressLike],
     [bigint],
@@ -671,6 +758,10 @@ export interface FlightSuretyApp extends BaseContract {
   >;
 
   isOperational: TypedContractMethod<[], [boolean], "view">;
+
+  isOracleRegistered: TypedContractMethod<[], [boolean], "view">;
+
+  isOwner: TypedContractMethod<[], [boolean], "view">;
 
   pay: TypedContractMethod<[flightNumber: string], [void], "nonpayable">;
 
@@ -760,6 +851,9 @@ export interface FlightSuretyApp extends BaseContract {
     "nonpayable"
   >;
   getFunction(
+    nameOrSignature: "airlineAddresses"
+  ): TypedContractMethod<[arg0: BigNumberish], [string], "view">;
+  getFunction(
     nameOrSignature: "authorizeCallers"
   ): TypedContractMethod<[_address: AddressLike], [void], "nonpayable">;
   getFunction(
@@ -807,6 +901,9 @@ export interface FlightSuretyApp extends BaseContract {
     nameOrSignature: "getAirlinesCount"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
+    nameOrSignature: "getAllAirlines"
+  ): TypedContractMethod<[], [FlightSuretyData.AirlineStructOutput[]], "view">;
+  getFunction(
     nameOrSignature: "getBalance"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
@@ -825,6 +922,9 @@ export interface FlightSuretyApp extends BaseContract {
     nameOrSignature: "getPassengerAddresses"
   ): TypedContractMethod<[], [string[]], "view">;
   getFunction(
+    nameOrSignature: "getPassengerCredit"
+  ): TypedContractMethod<[flightNumber: string], [bigint], "view">;
+  getFunction(
     nameOrSignature: "getVotes"
   ): TypedContractMethod<[_airlineAddress: AddressLike], [bigint], "view">;
   getFunction(
@@ -832,6 +932,12 @@ export interface FlightSuretyApp extends BaseContract {
   ): TypedContractMethod<[_airlineAddress: AddressLike], [boolean], "view">;
   getFunction(
     nameOrSignature: "isOperational"
+  ): TypedContractMethod<[], [boolean], "view">;
+  getFunction(
+    nameOrSignature: "isOracleRegistered"
+  ): TypedContractMethod<[], [boolean], "view">;
+  getFunction(
+    nameOrSignature: "isOwner"
   ): TypedContractMethod<[], [boolean], "view">;
   getFunction(
     nameOrSignature: "pay"
@@ -963,6 +1069,13 @@ export interface FlightSuretyApp extends BaseContract {
     RegisteredAirlineEvent.OutputTuple,
     RegisteredAirlineEvent.OutputObject
   >;
+  getEvent(
+    key: "UpdateOperatingStatus"
+  ): TypedContractEvent<
+    UpdateOperatingStatusEvent.InputTuple,
+    UpdateOperatingStatusEvent.OutputTuple,
+    UpdateOperatingStatusEvent.OutputObject
+  >;
 
   filters: {
     "AuthorizedContract(address)": TypedContractEvent<
@@ -1062,6 +1175,17 @@ export interface FlightSuretyApp extends BaseContract {
       RegisteredAirlineEvent.InputTuple,
       RegisteredAirlineEvent.OutputTuple,
       RegisteredAirlineEvent.OutputObject
+    >;
+
+    "UpdateOperatingStatus(bool)": TypedContractEvent<
+      UpdateOperatingStatusEvent.InputTuple,
+      UpdateOperatingStatusEvent.OutputTuple,
+      UpdateOperatingStatusEvent.OutputObject
+    >;
+    UpdateOperatingStatus: TypedContractEvent<
+      UpdateOperatingStatusEvent.InputTuple,
+      UpdateOperatingStatusEvent.OutputTuple,
+      UpdateOperatingStatusEvent.OutputObject
     >;
   };
 }

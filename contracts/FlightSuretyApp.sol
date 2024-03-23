@@ -36,12 +36,16 @@ contract FlightSuretyApp is FlightSuretyData {
     uint private constant MIN_FUNDING = 10 ether;
 
     uint256 public constant REGISTRATION_FEE = 1 ether;
-    uint256 private constant MIN_RESPONSES = 3;
+    uint256 private constant MIN_RESPONSES = 1;
 
-    uint8 private nonce = 0;
+
+    uint8 private constant MAX_VALUE = 10;
+    uint8 private constant INDEX_COUNT = 3;
+    
     address private contractOwner;
     bytes32[] private flightsInfo;
-
+    uint private nonce = 0;
+    uint8 private maxValue = 10;
     mapping(bytes32 => Flight) private flights;
     mapping(bytes32 => ResponseInfo) private oracleResponses;
     mapping(address => Oracle) private oracles;
@@ -208,9 +212,13 @@ contract FlightSuretyApp is FlightSuretyData {
     function registerOracle() external payable {
         require(msg.value >= REGISTRATION_FEE, "Registration fee is required");
 
-        uint8[3] memory indexes = generateIndexes(msg.sender);
+        uint8[INDEX_COUNT] memory indexes = generateIndexes(msg.sender);
 
         oracles[msg.sender] = Oracle({isRegistered: true, indexes: indexes});
+    }
+
+    function isOracleRegistered() external view returns(bool) {
+        return oracles[msg.sender].isRegistered;
     }
 
     function getMyIndexes() external view returns (uint8[3] memory) {
@@ -254,42 +262,30 @@ contract FlightSuretyApp is FlightSuretyData {
         }
     }
 
-    function generateIndexes(
-        address account
-    ) internal returns (uint8[3] memory) {
-        uint8[3] memory indexes;
-        indexes[0] = getRandomIndex(account);
+    function generateIndexes(address account) internal returns (uint8[INDEX_COUNT] memory) {
+        uint8[INDEX_COUNT] memory indexes;
 
-        indexes[1] = indexes[0];
-        while (indexes[1] == indexes[0]) {
-            indexes[1] = getRandomIndex(account);
-        }
-
-        indexes[2] = indexes[1];
-        while ((indexes[2] == indexes[0]) || (indexes[2] == indexes[1])) {
-            indexes[2] = getRandomIndex(account);
+        for(uint8 i = 0; i < INDEX_COUNT; ++i) {
+            indexes[i] = getRandomIndex(account);
+            for (uint8 j = 0; j < i; ++j) {
+                // Ensure uniqueness
+                if(indexes[j] == indexes[i]) {
+                    indexes[i] = getRandomIndex(account);
+                    j = 0; // Restart the check if a duplicate was found
+                }
+            }
         }
 
         return indexes;
     }
 
-    function getRandomIndex(address account) internal returns (uint8) {
-        uint8 maxValue = 10;
-
-        uint8 random = uint8(
-            uint256(
-                keccak256(
-                    abi.encodePacked(blockhash(block.number - nonce++), account)
-                )
-            ) % maxValue
-        );
-
-        if (nonce > 250) {
-            nonce = 0;
-        }
+  function getRandomIndex(address account) private returns (uint8) {
+        uint8 random = uint8(uint256(keccak256(abi.encodePacked(blockhash(block.number - 1), account, nonce))) % maxValue);
+        nonce = (nonce + 1) % 251;
 
         return random;
     }
+
 
     function getFlights() public view returns (Flight[] memory) {
         uint len = flightsInfo.length;

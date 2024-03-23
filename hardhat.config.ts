@@ -20,7 +20,7 @@ const config: HardhatUserConfig = {
       allowUnlimitedContractSize: true,
       accounts: {
         count: 50,
-      },
+      }
     },
     sepolia: {
       url: `https://sepolia.infura.io/v3/${infuraKey}`,

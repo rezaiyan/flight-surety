@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
+import "hardhat/console.sol";
 
 contract FlightSuretyData {
     struct Airline {
         string name;
+        address _address;
         bool isRegistered;
         uint funding;
     }
@@ -21,6 +23,7 @@ contract FlightSuretyData {
     bool private operational = true;
     address[] private passengerAddresses;
 
+    address[] public airlineAddresses;
     mapping(address => Airline) airlines;
     mapping(address => uint) private votes;
     mapping(address => address[]) private airlineVoters;
@@ -28,6 +31,7 @@ contract FlightSuretyData {
     mapping(string => bool) flightExists;
     mapping(bytes32 => Passenger) private passengers;
 
+    event UpdateOperatingStatus(bool mode);
     event AuthorizedContract(address indexed addr);
     event DeAuthorizedContract(address indexed addr);
     event InsuranceBought(
@@ -43,11 +47,13 @@ contract FlightSuretyData {
 
     constructor(address _airlineAddress) {
         contractOwner = msg.sender;
-        airlines[_airlineAddress] = Airline({
-            name: "Genesis Air",
-            isRegistered: true,
-            funding: 0
-        });
+        airlineAddresses.push(_airlineAddress);
+        airlines[_airlineAddress] = Airline(
+            "My Airline",
+            _airlineAddress,
+            true,
+            10 ether
+        );
         authorizedCallers[_airlineAddress] = 1;
         authorizedCallers[contractOwner] = 1;
         airlinesCount++;
@@ -71,11 +77,16 @@ contract FlightSuretyData {
         _;
     }
 
+    function isOwner() public view returns (bool) {
+        return msg.sender == contractOwner;
+    }
+
     function isOperational() public view returns (bool) {
         return operational;
     }
 
     function setOperatingStatus(bool mode) external requireContractOwner {
+        emit UpdateOperatingStatus(mode);
         operational = mode;
     }
 
@@ -97,11 +108,9 @@ contract FlightSuretyData {
         address _airlineAddress,
         string memory _name
     ) public requireIsOperational requireIsAuthorizedCaller {
-        airlines[_airlineAddress] = Airline({
-            name: _name,
-            isRegistered: true,
-            funding: 0
-        });
+        airlines[_airlineAddress] = Airline(_name, _airlineAddress, true, 0);
+        authorizedCallers[_airlineAddress] = 1;
+        airlineAddresses.push(_airlineAddress);
         airlinesCount++;
     }
 
@@ -296,5 +305,23 @@ contract FlightSuretyData {
         returns (address[] memory)
     {
         return passengerAddresses;
+    }
+
+    function getAllAirlines() public view returns (Airline[] memory) {
+        Airline[] memory allAirlines = new Airline[](airlineAddresses.length);
+        for (uint i = 0; i < airlineAddresses.length; i++) {
+            Airline storage airline = airlines[airlineAddresses[i]];
+            allAirlines[i] = airline;
+        }
+        return allAirlines;
+    }
+
+    function getPassengerCredit(
+        string memory flightNumber
+    ) external view returns (uint) {
+        bytes32 passengerKey = keccak256(
+            abi.encodePacked(flightNumber, msg.sender)
+        );
+        return passengers[passengerKey].credit;
     }
 }

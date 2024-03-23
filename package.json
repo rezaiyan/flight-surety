@@ -7,9 +7,17 @@
     "openzeppelin-solidity": "^4.0"
   },
   "devDependencies": {
+    "concurrently": "^8.2.2",
     "hardhat": "^2.19.4"
   },
-  "scripts": {
-    "server": "node ./apps/server/src/index.js"
-  }
+"scripts": {
+  "server": "node ./apps/server/src/index.js",
+  "compile": "rm -rf ./artifacts && rm -rf ./apps/frontend/src/artifacts && rm -rf ./apps/server/src/artifacts && npx hardhat compile",
+  "dapp": "cd ./apps/frontend && npm start",
+  "help": "echo 'Available scripts: server, compile, deployLocalhost, deploySepolia, dapp, flightsuretyLocalhost, flightsuretySepolia'",
+  "deployLocalhost": "npx hardhat run scripts/deploy.ts --network localhost",
+  "deploySepolia": "npx hardhat run scripts/deploy.ts --network sepolia",
+  "flightsuretyLocalhost": "npm run compile && concurrently \"npx hardhat node\" \"npm run deployLocalhost\" \"npm run dapp\"",
+  "flightsuretySepolia": "npm run compile && concurrently \"npx hardhat node\" \"npm run deploySepolia\" \"npm run dapp\""
+}
 }
