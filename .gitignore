@@ -4,6 +4,8 @@ build
 /node_modules
 # production
 /build
+/typechain-types
+/cache
 .env
 # misc
 .DS_Store
