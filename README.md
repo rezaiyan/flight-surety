@@ -92,7 +92,7 @@ These scripts are designed to make the development, testing, and deployment proc
 
 ## Libraries Used
 
-### Supply Chain Dapp (Smart Contracts)
+### Smart Contracts
 
 - `@nomicfoundation/hardhat-toolbox` (Version: ^4.0.0)
      - It provides essential utilities for testing, deployment, and development workflows, making it easier to manage the Ethereum smart contracts in the project.
@@ -112,7 +112,7 @@ These scripts are designed to make the development, testing, and deployment proc
 - `@web3-react/injected-connector` (Version: ^6.0.7)
     - For connecting to Ethereum wallets that inject the Ethereum provider into the browser, such as MetaMask or other browser extensions. 
 - `ethers` (Version: ^5.5.2)
-    - Ethers.js simplifies interactions with Ethereum smart contracts and blockchain data, making it easier to build Ethereum-related functionality in the  
+    - Ethers.js simplifies interactions with Ethereum smart contracts and blockchain data, making it easier to build Ethereum-related functionality
 - `react` (Version: ^17.0.2) and `react-dom` (Version: ^17.0.2)
     - React is the core library for building the frontend user interface of the application. It offers component-based architecture and efficient rendering. 
 - `react-scripts` (Version: 5.0.0)
@@ -120,6 +120,13 @@ These scripts are designed to make the development, testing, and deployment proc
 - `styled-components` (Version: ^5.3.3)
     -  It enables the creation of dynamic and styled components, providing a more maintainable and structured approach to styling React components.
 
+### Server App
+- `express` (Version: 4.18.3)
+     - Express is a minimal and flexible Node.js web application framework that provides a robust set of features for web and mobile applications. APIs.
+- `ethers` (Version: ^5.5.2)
+    - Ethers.js simplifies interactions with Ethereum smart contracts and blockchain data, making it easier to build Ethereum-related functionality
+  
+  ## Screenshot
 | Feature            | Screenshot                                       |
 | ------------------ | ------------------------------------------------ |
 | Deployment       |  <img src="assets/deploy.png" width="300" />       |
